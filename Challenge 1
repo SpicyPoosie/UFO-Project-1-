@@ -1,0 +1,172 @@
+                                                     (*This text is not in code* "Barrier Code")
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Barrier : MonoBehaviour
+{
+    public float speed;
+    private string direction = "right";
+
+    void FixedUpdate()
+    {
+        if (direction == "right")
+        {
+            if (transform.position.x != 6.85f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(6.85f, transform.position.y), speed * Time.deltaTime);
+            }
+            else
+            {
+                direction = "left";
+            }
+        }
+        else
+        {
+            if (transform.position.x != -7f)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, new Vector2(-7f, transform.position.y), speed * Time.deltaTime);
+            }
+            else
+            {
+                direction = "right";
+            }
+        }
+    }
+}
+                                               (*This text is not in the code* "PlayerMovement")
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
+
+public class PlayerMovement : MonoBehaviour
+{
+
+    public float speed;
+    public Text countText;
+    public Text winText;
+    public Text livesText;
+    public int level;
+
+    private Rigidbody2D rb2d;
+    private static int count;
+    public static int lives;
+    private bool gameOver;
+    private void Start()
+    {
+        rb2d = GetComponent<Rigidbody2D>();
+        winText.text = "";
+
+        if (level == 1)
+        {
+            count = 0;
+            lives = 3;
+        }
+
+        SetCountText();
+        SetLivesText();
+    }
+    private void FixedUpdate()
+    {
+        float moveHorizontal = Input.GetAxis("Horizontal");
+        float moveVertical = Input.GetAxis("Vertical");
+
+        if (!gameOver)
+        {
+            Vector2 movement = new Vector2(moveHorizontal, moveVertical);
+            rb2d.AddForce(movement * speed);
+        }
+
+        if (Input.GetKey("escape"))
+            Application.Quit();
+    }
+
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+
+        if (other.gameObject.CompareTag("PickUp") & !gameOver)
+        {
+            other.gameObject.SetActive(false);
+            count += 1;
+            SetCountText();
+        }
+        if (other.gameObject.CompareTag("Enemy") & !gameOver)
+        {
+            other.gameObject.SetActive(false);
+            lives -= 1;
+            SetLivesText();
+
+            if (lives <= 0)
+            {
+                winText.text = "<b>You Lose!</b>";
+                gameOver = true;
+            }
+        }
+    }
+    void SetCountText()
+    {
+        countText.text = "<i>Count: " + count.ToString() + "</i>";
+        if (level == 1 & count >= 13)
+        {
+            SceneManager.LoadScene("Level 2");
+        }
+        if (level == 2 & count >= 21)
+        {
+            winText.text = "<b>You Win! Game created by Brynn Jones!</b>";
+            gameOver = true;
+        }
+    }
+
+    void SetLivesText()
+    {
+        livesText.text = "<i>Lives: " + lives.ToString() + "</i>";
+    }
+}
+                                                    (*This text is not in the code* "Rotator")
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Rotator : MonoBehaviour
+{
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        transform.Rotate (new Vector3 (0, 0, 45) * Time.deltaTime);
+    }
+}
+                                                     (*This text is not in the code* "CameraController")
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class cameraController : MonoBehaviour
+
+    
+{
+    public GameObject player;
+
+    private Vector3 offset;
+    // Start is called before the first frame update
+    void Start()
+    {
+        offset = transform.position - player.transform.position;   
+    }
+
+    // Update is called once per frame
+    void LateUpdate()
+    {
+        transform.position = player.transform.position + offset; 
+        
+    }
+}
